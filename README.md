@@ -19,17 +19,13 @@ A dynamic, drag-and-drop form builder built with React. This tool allows users t
 ### Installation
 ```bash
 npm install
-# or
-yarn install
 ```
 
 ### Running the App
 ```bash
 npm start
-# or
-yarn start
 ```
-The app will be available at `http://localhost:3000` by default.
+The app will be available at `http://localhost:3001` by default.
 
 ## Initial Setup Commands
 These are the commands used to set up the project from scratch:
