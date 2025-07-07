@@ -66,6 +66,8 @@ function App() {
   const moveComponent = useFormStore((state) => state.moveComponent);
   const components = useFormStore((state) => state.components);
   const [preview, setPreview] = useState(false);
+  const [activeTab, setActiveTab] = useState('demo'); // 'demo', 'schema', 'uischema', 'data'
+  const [formData, setFormData] = useState({}); // For Data tab (optional, can be improved)
 
   // Handles both adding new components and reordering
   const handleDragEnd = (event) => {
@@ -93,8 +95,8 @@ function App() {
   const jsonSchema = useMemo(() => generateJsonSchema(components), [components]);
   const uiSchema = useMemo(() => generateUiSchema(components), [components]);
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(JSON.stringify(jsonSchema, null, 2));
+  const handleCopy = (data) => {
+    navigator.clipboard.writeText(JSON.stringify(data, null, 2));
   };
 
   const handleExport = () => {
@@ -115,6 +117,14 @@ function App() {
     a2.click();
     URL.revokeObjectURL(uiUrl);
   };
+
+  // Tab button style helper
+  const tabBtn = (tab) =>
+    `px-4 py-2 font-semibold border-b-2 transition-colors duration-150 ${
+      activeTab === tab
+        ? 'border-blue-600 text-blue-600'
+        : 'border-transparent text-gray-500 hover:text-blue-600 hover:border-blue-300'
+    }`;
 
   return (
     <DndContext onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
@@ -137,6 +147,12 @@ function App() {
             </button>
           </div>
         </div>
+        {/* Tabs */}
+        <div className="flex border-b bg-white px-6">
+          <button className={tabBtn('demo')} onClick={() => setActiveTab('demo')}>Demo</button>
+          <button className={tabBtn('schema')} onClick={() => setActiveTab('schema')}>Schema</button>
+          <button className={tabBtn('uischema')} onClick={() => setActiveTab('uischema')}>UI Schema</button>
+        </div>
         <div className="flex w-full flex-1 overflow-hidden">
           {!preview && (
             <aside className="w-[20%] min-w-[200px] max-w-[250px] bg-gray-100 border-r">
@@ -144,14 +160,17 @@ function App() {
             </aside>
           )}
           <main className="w-[60%] flex-grow bg-white overflow-y-auto flex flex-col">
-            <Canvas preview={preview} onDragStart={handleDragStart} onDragEnd={handleDragEnd} />
-            {!preview && (
+            {/* Tab Content */}
+            {activeTab === 'demo' && (
+              <Canvas preview={preview} onDragStart={handleDragStart} onDragEnd={handleDragEnd} />
+            )}
+            {activeTab === 'schema' && (
               <div className="mt-6 p-4 bg-gray-100 rounded border">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-semibold">Live JSON Schema</h3>
                   <button
                     className="text-xs bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
-                    onClick={handleCopy}
+                    onClick={() => handleCopy(jsonSchema)}
                   >
                     Copy
                   </button>
@@ -159,12 +178,34 @@ function App() {
                 <pre className="text-xs bg-gray-900 text-green-200 rounded p-2 overflow-x-auto">
                   {JSON.stringify(jsonSchema, null, 2)}
                 </pre>
-                <div className="mt-4">
+                <button
+                  className="mt-2 text-xs bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
+                  onClick={handleExport}
+                >
+                  Export Schema & UI Schema
+                </button>
+              </div>
+            )}
+            {activeTab === 'uischema' && (
+              <div className="mt-6 p-4 bg-gray-100 rounded border">
+                <div className="flex items-center justify-between mb-2">
                   <h3 className="font-semibold">Live UI Schema</h3>
-                  <pre className="text-xs bg-gray-900 text-blue-200 rounded p-2 overflow-x-auto">
-                    {JSON.stringify(uiSchema, null, 2)}
-                  </pre>
+                  <button
+                    className="text-xs bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
+                    onClick={() => handleCopy(uiSchema)}
+                  >
+                    Copy
+                  </button>
                 </div>
+                <pre className="text-xs bg-gray-900 text-blue-200 rounded p-2 overflow-x-auto">
+                  {JSON.stringify(uiSchema, null, 2)}
+                </pre>
+                <button
+                  className="mt-2 text-xs bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
+                  onClick={handleExport}
+                >
+                  Export Schema & UI Schema
+                </button>
               </div>
             )}
           </main>

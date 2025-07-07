@@ -22,7 +22,7 @@ const DraggableItem = ({ type, label }) => {
 
 const Palette = () => {
   return (
-    <div className="p-4 h-screen overflow-y-auto">
+    <div className="p-4 h-screen overflow-y-auto overflow-x-hidden w-full max-w-full">
       <h2 className="text-lg font-semibold mb-4">Component Palette</h2>
       {COMPONENTS.map((comp) => (
         <DraggableItem key={comp.type} {...comp} />
