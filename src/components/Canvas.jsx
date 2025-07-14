@@ -11,7 +11,20 @@ const GRID_COLS = 12;
 const GRID_ROW_HEIGHT = 60;
 const GRID_WIDTH = 900; // px, adjust as needed
 
-const FieldPreview = ({ type, config, value, onChange, fullHeight }) => {
+const FieldPreview = ({ type, config, value, onChange, fullHeight, preview }) => {
+  // For preview mode, set textarea to 3 lines, others to 1 line
+  let minInputStyle = {};
+  if (preview) {
+    if (type === 'textarea') {
+      minInputStyle = { minWidth: '120px', minHeight: '4.5em', height: '4.5em', resize: 'none' };
+    } else if (type === 'radio') {
+      minInputStyle = { width: '1em', height: '1em' };
+    } else if (type === 'checkbox') {
+      minInputStyle = { width: '1em', height: '1em' };
+    } else {
+      minInputStyle = { minWidth: '120px', minHeight: '2.5em', height: '2.5em' };
+    }
+  }
   switch (type) {
     case 'text':
       return (
@@ -23,7 +36,7 @@ const FieldPreview = ({ type, config, value, onChange, fullHeight }) => {
             placeholder={config.placeholder}
             value={value || ''}
             onChange={onChange}
-            style={{ minHeight: 0 }}
+            style={{ minHeight: 0, ...minInputStyle }}
           />
         </div>
       );
@@ -32,11 +45,11 @@ const FieldPreview = ({ type, config, value, onChange, fullHeight }) => {
         <div className="flex flex-col h-full w-full min-h-0">
           <label className="block font-medium mb-1">{config.label}{config.required && ' *'}</label>
           <textarea
-            className={`border rounded resize-none flex-1 w-full h-full min-h-0 ${fullHeight ? '' : ''}`}
+            className={`border rounded flex-1 w-full h-full min-h-0 ${fullHeight ? '' : ''}`}
             placeholder={config.placeholder}
             value={value || ''}
             onChange={onChange}
-            style={{ minHeight: 0 }}
+            style={{ minHeight: 0, ...minInputStyle }}
           />
         </div>
       );
@@ -50,7 +63,7 @@ const FieldPreview = ({ type, config, value, onChange, fullHeight }) => {
             placeholder={config.placeholder}
             value={value || ''}
             onChange={onChange}
-            style={{ minHeight: 0 }}
+            style={{ minHeight: 0, ...minInputStyle }}
           />
         </div>
       );
@@ -62,6 +75,7 @@ const FieldPreview = ({ type, config, value, onChange, fullHeight }) => {
               type="checkbox"
               checked={!!value}
               onChange={onChange}
+              style={preview ? { width: '1em', height: '1em' } : {}}
             />
             <span className="font-medium">{config.label}{config.required && ' *'}</span>
           </label>
@@ -80,6 +94,7 @@ const FieldPreview = ({ type, config, value, onChange, fullHeight }) => {
                   value={opt}
                   checked={value === opt}
                   onChange={onChange}
+                  style={preview ? { width: '1em', height: '1em' } : {}}
                 />
                 {opt}
               </label>
@@ -95,7 +110,7 @@ const FieldPreview = ({ type, config, value, onChange, fullHeight }) => {
             className={`border rounded flex-1 w-full h-full min-h-0 ${fullHeight ? '' : ''}`}
             value={value || ''}
             onChange={onChange}
-            style={{ minHeight: 0 }}
+            style={{ minHeight: 0, ...minInputStyle }}
           >
             <option value="">Select...</option>
             {(config.options || []).map((opt, idx) => (
@@ -113,7 +128,7 @@ const FieldPreview = ({ type, config, value, onChange, fullHeight }) => {
             className={`border rounded flex-1 w-full h-full min-h-0 ${fullHeight ? '' : ''}`}
             value={value || ''}
             onChange={onChange}
-            style={{ minHeight: 0 }}
+            style={{ minHeight: 0, ...minInputStyle }}
           />
         </div>
       );
@@ -200,7 +215,7 @@ const Canvas = ({ preview = false }) => {
           <div
             key={comp.id}
             data-grid={layout[idx]}
-            className={`border rounded bg-gray-50 h-full w-full flex flex-col items-stretch justify-stretch ${selectedId === comp.id ? 'border-blue-500' : 'border-gray-300'}`}
+            className={`border rounded bg-gray-50 h-full w-full flex flex-col items-stretch justify-stretch ${selectedId === comp.id ? 'border-blue-500' : 'border-gray-300'} ${preview ? 'p-3' : ''}`}
             onClick={() => !preview && selectComponent(comp.id)}
           >
             {preview ? (
@@ -218,6 +233,7 @@ const Canvas = ({ preview = false }) => {
                   }
                 }}
                 fullHeight={true}
+                preview={preview}
               />
             ) : (
               <>
