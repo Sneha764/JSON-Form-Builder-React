@@ -43,6 +43,7 @@ export const useFormStore = create((set) => ({
           id: nanoid(),
           type,
           config: getDefaultConfig(type, state.components),
+          layout: { x: 0, y: 0, w: 4, h: 2 }, // default grid position and size
         },
       ],
     })),
@@ -53,6 +54,13 @@ export const useFormStore = create((set) => ({
     set((state) => ({
       components: state.components.map((c) =>
         c.id === id ? { ...c, config: { ...c.config, ...config } } : c
+      ),
+    })),
+
+  updateComponentLayout: (id, layout) =>
+    set((state) => ({
+      components: state.components.map((c) =>
+        c.id === id ? { ...c, layout: { ...c.layout, ...layout } } : c
       ),
     })),
 

@@ -1,72 +1,77 @@
 import React from 'react';
-import { useDroppable } from '@dnd-kit/core';
 import { useFormStore } from '../store/useFormStore';
-import { useSortable, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+import GridLayout, { WidthProvider, Responsive } from 'react-grid-layout';
+import { useDroppable, useDndMonitor } from '@dnd-kit/core';
+import 'react-grid-layout/css/styles.css';
+import 'react-resizable/css/styles.css';
 
-const FieldSummary = ({ type, config }) => (
-  <div className="flex flex-col">
-    <span className="font-semibold">{config.label || '(No label)'}</span>
-    <span className="text-xs text-gray-500">{type}</span>
-  </div>
-);
+const ResponsiveGridLayout = WidthProvider(Responsive);
 
-const FieldPreview = ({ type, config, value, onChange }) => {
+const GRID_COLS = 12;
+const GRID_ROW_HEIGHT = 60;
+const GRID_WIDTH = 900; // px, adjust as needed
+
+const FieldPreview = ({ type, config, value, onChange, fullHeight }) => {
   switch (type) {
     case 'text':
       return (
-        <div className="mb-2">
+        <div className="flex flex-col h-full w-full min-h-0">
           <label className="block font-medium mb-1">{config.label}{config.required && ' *'}</label>
           <input
             type="text"
-            className="border p-1 w-full rounded"
+            className={`border rounded flex-1 w-full h-full min-h-0 ${fullHeight ? '' : ''}`}
             placeholder={config.placeholder}
             value={value || ''}
             onChange={onChange}
+            style={{ minHeight: 0 }}
           />
         </div>
       );
     case 'textarea':
       return (
-        <div className="mb-2">
+        <div className="flex flex-col h-full w-full min-h-0">
           <label className="block font-medium mb-1">{config.label}{config.required && ' *'}</label>
           <textarea
-            className="border p-1 w-full rounded"
+            className={`border rounded resize-none flex-1 w-full h-full min-h-0 ${fullHeight ? '' : ''}`}
             placeholder={config.placeholder}
             value={value || ''}
             onChange={onChange}
+            style={{ minHeight: 0 }}
           />
         </div>
       );
     case 'number':
       return (
-        <div className="mb-2">
+        <div className="flex flex-col h-full w-full min-h-0">
           <label className="block font-medium mb-1">{config.label}{config.required && ' *'}</label>
           <input
             type="number"
-            className="border p-1 w-full rounded"
+            className={`border rounded flex-1 w-full h-full min-h-0 ${fullHeight ? '' : ''}`}
             placeholder={config.placeholder}
             value={value || ''}
             onChange={onChange}
+            style={{ minHeight: 0 }}
           />
         </div>
       );
     case 'checkbox':
       return (
-        <div className="mb-2 flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={!!value}
-            onChange={onChange}
-          />
-          <label className="font-medium">{config.label}{config.required && ' *'}</label>
+        <div className="flex flex-col h-full w-full items-center justify-center">
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={!!value}
+              onChange={onChange}
+            />
+            <span className="font-medium">{config.label}{config.required && ' *'}</span>
+          </label>
         </div>
       );
     case 'radio':
       return (
-        <div className="mb-2">
+        <div className="flex flex-col h-full w-full justify-center">
           <label className="block font-medium mb-1">{config.label}{config.required && ' *'}</label>
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-1 flex-1 justify-center">
             {(config.options || []).map((opt, idx) => (
               <label key={idx} className="flex items-center gap-2">
                 <input
@@ -84,12 +89,13 @@ const FieldPreview = ({ type, config, value, onChange }) => {
       );
     case 'dropdown':
       return (
-        <div className="mb-2">
+        <div className="flex flex-col h-full w-full min-h-0">
           <label className="block font-medium mb-1">{config.label}{config.required && ' *'}</label>
           <select
-            className="border p-1 w-full rounded"
+            className={`border rounded flex-1 w-full h-full min-h-0 ${fullHeight ? '' : ''}`}
             value={value || ''}
             onChange={onChange}
+            style={{ minHeight: 0 }}
           >
             <option value="">Select...</option>
             {(config.options || []).map((opt, idx) => (
@@ -100,13 +106,14 @@ const FieldPreview = ({ type, config, value, onChange }) => {
       );
     case 'date':
       return (
-        <div className="mb-2">
+        <div className="flex flex-col h-full w-full min-h-0">
           <label className="block font-medium mb-1">{config.label}{config.required && ' *'}</label>
           <input
             type="date"
-            className="border p-1 w-full rounded"
+            className={`border rounded flex-1 w-full h-full min-h-0 ${fullHeight ? '' : ''}`}
             value={value || ''}
             onChange={onChange}
+            style={{ minHeight: 0 }}
           />
         </div>
       );
@@ -115,66 +122,11 @@ const FieldPreview = ({ type, config, value, onChange }) => {
   }
 };
 
-const SortableField = ({ comp, index, preview, onRemove, onSelect, selected, value, onValueChange }) => {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: comp.id });
-  return (
-    <div
-      ref={setNodeRef}
-      style={{ transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1 }}
-      className={`border p-3 rounded mb-3 ${
-        !preview && selected ? 'border-blue-500' : 'border-gray-300'
-      } ${!preview ? 'cursor-pointer bg-gray-50 hover:bg-gray-100 flex items-center' : 'bg-white'}`}
-      onClick={() => !preview && onSelect(comp.id)}
-    >
-      {!preview && (
-        <span
-          className="mr-2 cursor-grab text-gray-400 hover:text-gray-700 select-none"
-          {...attributes}
-          {...listeners}
-          title="Drag to reorder"
-        >
-          ≡
-        </span>
-      )}
-      <div className="flex-1">
-        {preview ? (
-          <FieldPreview
-            type={comp.type}
-            config={comp.config}
-            value={value}
-            onChange={e => {
-              if (comp.type === 'checkbox') {
-                onValueChange(comp.config.name, e.target.checked);
-              } else if (comp.type === 'radio') {
-                onValueChange(comp.config.name, e.target.value);
-              } else {
-                onValueChange(comp.config.name, e.target.value);
-              }
-            }}
-          />
-        ) : (
-          <FieldSummary type={comp.type} config={comp.config} />
-        )}
-      </div>
-      {!preview && (
-        <button
-          className="ml-2 text-red-500 hover:text-red-700 px-2 py-1 rounded"
-          onClick={e => { e.stopPropagation(); onRemove(comp.id); }}
-          title="Remove"
-        >
-          ✕
-        </button>
-      )}
-    </div>
-  );
-};
-
-const Canvas = ({ preview = false, onDragStart, onDragEnd }) => {
-  const { isOver, setNodeRef } = useDroppable({ id: 'canvas-drop' });
-  const { components, selectComponent, selectedId, removeComponent } = useFormStore();
-
-  // Form state for preview mode
+const Canvas = ({ preview = false }) => {
+  const { components, selectComponent, selectedId, removeComponent, updateComponentLayout, addComponent } = useFormStore();
   const [formData, setFormData] = React.useState({});
+  const canvasRef = React.useRef(null);
+
   React.useEffect(() => {
     if (!preview) setFormData({});
   }, [preview, components.length]);
@@ -183,65 +135,118 @@ const Canvas = ({ preview = false, onDragStart, onDragEnd }) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  if (preview) {
-    return (
-      <div className="w-full min-h-screen flex flex-col items-center justify-center">
-        <div className="w-full max-w-xl mx-auto flex flex-col items-center">
-          <h2 className="text-2xl font-semibold mb-6 text-center">Form Canvas</h2>
-          <SortableContext items={components.map(c => c.id)} strategy={verticalListSortingStrategy}>
-            <div className="w-full">
-              {components.map((comp, idx) => (
-                <SortableField
-                  key={comp.id}
-                  comp={comp}
-                  index={idx}
-                  preview={preview}
-                  onRemove={removeComponent}
-                  onSelect={selectComponent}
-                  selected={comp.id === selectedId}
-                  value={formData[comp.config.name]}
-                  onValueChange={handleValueChange}
-                />
-              ))}
-            </div>
-          </SortableContext>
-          {components.length === 0 && (
-            <div className="text-gray-400 text-center mt-8">Drag fields here to build your form</div>
-          )}
-          <div className="mt-6 w-full">
-            <h3 className="font-semibold mb-2">Form Data:</h3>
-            <pre className="bg-gray-900 text-green-200 rounded p-2 text-xs overflow-x-auto">
-              {JSON.stringify(formData, null, 2)}
-            </pre>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // dnd-kit drop support for Palette -> Canvas
+  const { setNodeRef, isOver } = useDroppable({ id: 'canvas-drop' });
+  useDndMonitor({
+    onDragEnd(event) {
+      const { over, active } = event;
+      if (over && over.id === 'canvas-drop' && active.data?.current?.componentType) {
+        // Calculate grid x/y from mouse position
+        const clientOffset = event.delta ? event.delta : { x: 0, y: 0 };
+        let x = 0, y = 0;
+        if (canvasRef.current && event.activatorEvent && event.activatorEvent.clientX) {
+          const rect = canvasRef.current.getBoundingClientRect();
+          const px = event.activatorEvent.clientX - rect.left;
+          const py = event.activatorEvent.clientY - rect.top;
+          x = Math.floor((px / GRID_WIDTH) * GRID_COLS);
+          y = Math.floor(py / GRID_ROW_HEIGHT);
+        }
+        // Add the new component at calculated grid position
+        addComponent(active.data.current.componentType, { x, y });
+      }
+    }
+  });
+
+  // Prepare layout for react-grid-layout
+  const layout = components.map((comp, idx) => ({
+    i: comp.id,
+    x: comp.layout?.x ?? (idx % 6),
+    y: comp.layout?.y ?? Math.floor(idx / 6),
+    w: comp.layout?.w ?? 4,
+    h: comp.layout?.h ?? 2,
+  }));
+
+  const onLayoutChange = (newLayout) => {
+    newLayout.forEach(l => {
+      updateComponentLayout(l.i, { x: l.x, y: l.y, w: l.w, h: l.h });
+    });
+  };
 
   return (
     <div
-      ref={setNodeRef}
-      className={`w-3/4 min-h-screen p-4 ${
-        isOver ? 'bg-green-100' : 'bg-white'
-      } transition-all`}
+      ref={node => {
+        setNodeRef(node);
+        canvasRef.current = node;
+      }}
+      className={`w-full min-h-screen p-4 bg-white ${isOver ? 'bg-green-100' : ''}`}
+      style={{ maxWidth: GRID_WIDTH, margin: '0 auto' }}
     >
       <h2 className="text-lg font-semibold mb-4">Form Canvas</h2>
-      <SortableContext items={components.map(c => c.id)} strategy={verticalListSortingStrategy}>
+      <ResponsiveGridLayout
+        className="layout"
+        layouts={{ lg: layout }}
+        breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
+        cols={{ lg: GRID_COLS, md: 10, sm: 6, xs: 4, xxs: 2 }}
+        rowHeight={GRID_ROW_HEIGHT}
+        isDraggable={!preview}
+        isResizable={!preview}
+        onLayoutChange={onLayoutChange}
+        measureBeforeMount={false}
+        useCSSTransforms={true}
+        compactType={null}
+        preventCollision={false}
+      >
         {components.map((comp, idx) => (
-          <SortableField
+          <div
             key={comp.id}
-            comp={comp}
-            index={idx}
-            preview={false}
-            onRemove={removeComponent}
-            onSelect={selectComponent}
-            selected={comp.id === selectedId}
-          />
+            data-grid={layout[idx]}
+            className={`border rounded bg-gray-50 h-full w-full flex flex-col items-stretch justify-stretch ${selectedId === comp.id ? 'border-blue-500' : 'border-gray-300'}`}
+            onClick={() => !preview && selectComponent(comp.id)}
+          >
+            {preview ? (
+              <FieldPreview
+                type={comp.type}
+                config={comp.config}
+                value={formData[comp.config.name]}
+                onChange={e => {
+                  if (comp.type === 'checkbox') {
+                    handleValueChange(comp.config.name, e.target.checked);
+                  } else if (comp.type === 'radio') {
+                    handleValueChange(comp.config.name, e.target.value);
+                  } else {
+                    handleValueChange(comp.config.name, e.target.value);
+                  }
+                }}
+                fullHeight={true}
+              />
+            ) : (
+              <>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="font-semibold">{comp.config.label || '(No label)'}</span>
+                  <button
+                    className="text-red-500 hover:text-red-700 px-2 py-1 rounded"
+                    onClick={e => { e.stopPropagation(); removeComponent(comp.id); }}
+                    title="Remove"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <span className="text-xs text-gray-500">{comp.type}</span>
+              </>
+            )}
+          </div>
         ))}
-      </SortableContext>
+      </ResponsiveGridLayout>
       {components.length === 0 && (
         <div className="text-gray-400 text-center mt-8">Drag fields here to build your form</div>
+      )}
+      {preview && (
+        <div className="mt-6 w-full">
+          <h3 className="font-semibold mb-2">Form Data:</h3>
+          <pre className="bg-gray-900 text-green-200 rounded p-2 text-xs overflow-x-auto">
+            {JSON.stringify(formData, null, 2)}
+          </pre>
+        </div>
       )}
     </div>
   );

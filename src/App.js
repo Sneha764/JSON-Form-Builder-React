@@ -73,13 +73,14 @@ function App() {
   const handleDragEnd = (event) => {
     const { over, active } = event;
     // Add from palette
-    if (over && over.id === 'canvas-drop') {
-      const { componentType } = active.data.current || {};
-      if (componentType) {
-        addComponent(componentType);
-        return;
-      }
-    }
+    // REMOVE this block to prevent double add
+    // if (over && over.id === 'canvas-drop') {
+    //   const { componentType } = active.data.current || {};
+    //   if (componentType) {
+    //     addComponent(componentType);
+    //     return;
+    //   }
+    // }
     // Reorder
     if (active && over && active.id !== over.id) {
       const oldIndex = components.findIndex(c => c.id === active.id);
