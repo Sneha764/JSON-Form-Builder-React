@@ -63,8 +63,4 @@ npm install zustand
 4. Preview: Use the Preview button to see the form as an end user would.
 5. Export: Click the Export button to download the current schemas.
 
-## Project Structure
-- `src/components/` — Main UI components (Canvas, Palette, PropertyEditor)
-- `src/store/` — State management for form components
-- `src/utils/` — Utility constants and helpers
-- `src/App.js` — Main application logic and layout
+
