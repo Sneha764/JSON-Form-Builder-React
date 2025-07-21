@@ -1,5 +1,7 @@
 # JSON Form Builder
 
+This project is live at: https://json-form-builder-react.vercel.app/
+
 A dynamic, drag-and-drop form builder built with React. This tool allows users to visually design forms, instantly view the generated JSON Schema and UI Schema, and export them for use in other applications.
 
 ## Features
