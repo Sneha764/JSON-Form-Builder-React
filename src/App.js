@@ -218,6 +218,11 @@ function App() {
           )}
         </div>
       </div>
+      <footer
+        style={{ position: 'fixed', bottom: 0, left: 0, width: '100%', height: '28px', background: '#f3f4f6', borderTop: '1px solid #e5e7eb', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50 }}
+      >
+        <span className="text-gray-700 text-sm">Project by Sneha Yadav</span>
+      </footer>
     </DndContext>
   );
 }
