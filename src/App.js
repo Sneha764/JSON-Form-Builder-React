@@ -208,9 +208,6 @@ function App() {
                 >
                   Export Schema & UI Schema
                 </button>
-                <div className="mt-2 text-xs text-gray-600">
-                  <strong>Note:</strong> The exported UI Schema now includes a <code>layout</code> property for each field, containing <code>x</code>, <code>y</code>, <code>w</code>, <code>h</code> (grid position and size).
-                </div>
               </div>
             )}
           </main>
