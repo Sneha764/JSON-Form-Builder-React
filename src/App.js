@@ -57,7 +57,7 @@ function generateUiSchema(components) {
     elements: components.map((c) => ({
       type: 'Control',
       scope: `#/properties/${c.config.name}`,
-      layout: c.layout ? { ...c.layout } : undefined, // include layout info
+      layout: c.layout ? { ...c.layout } : undefined, 
     })),
   };
 }
@@ -68,20 +68,12 @@ function App() {
   const components = useFormStore((state) => state.components);
   const [preview, setPreview] = useState(false);
   const [activeTab, setActiveTab] = useState('demo'); // 'demo', 'schema', 'uischema', 'data'
-  const [formData, setFormData] = useState({}); // For Data tab (optional, can be improved)
+  const [formData, setFormData] = useState({});
 
   // Handles both adding new components and reordering
   const handleDragEnd = (event) => {
     const { over, active } = event;
     // Add from palette
-    // REMOVE this block to prevent double add
-    // if (over && over.id === 'canvas-drop') {
-    //   const { componentType } = active.data.current || {};
-    //   if (componentType) {
-    //     addComponent(componentType);
-    //     return;
-    //   }
-    // }
     // Reorder
     if (active && over && active.id !== over.id) {
       const oldIndex = components.findIndex(c => c.id === active.id);
