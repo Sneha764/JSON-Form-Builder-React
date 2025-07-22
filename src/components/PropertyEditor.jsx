@@ -1,4 +1,3 @@
-// src/components/PropertyEditor.jsx
 import React from 'react';
 import { useFormStore } from '../store/useFormStore';
 

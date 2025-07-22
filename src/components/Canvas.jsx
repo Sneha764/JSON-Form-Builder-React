@@ -7,17 +7,15 @@ import 'react-resizable/css/styles.css';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
-// === Configurable input height and box height for text, number, dropdown, date ===
-export const FIXED_INPUT_HEIGHT = '2em'; // Change this value to update input height
-export const FIXED_BOX_HEIGHT = '80px'; // Change this value to update grey box height
-export const MIN_BOX_HEIGHT = '80px'; // Change this value to set min height for all input types
+export const FIXED_INPUT_HEIGHT = '2em'; // to update input height
+export const FIXED_BOX_HEIGHT = '80px'; // to update grey box height
+export const MIN_BOX_HEIGHT = '80px'; // to set min height for all input types
 
 const GRID_COLS = 12;
 const GRID_ROW_HEIGHT = 80;
-const GRID_WIDTH = 900; // px, adjust as needed
+const GRID_WIDTH = 900; // default in px
 
 const FieldPreview = ({ type, config, value, onChange, fullHeight, preview }) => {
-  // For preview mode, set textarea to 3 lines, others to 1 line
   let minInputStyle = {};
   const [parentHeight, setParentHeight] = React.useState(null);
   const parentRef = React.useRef(null);
